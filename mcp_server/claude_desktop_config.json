@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "cfdb-data": {
+      "command": "python",
+      "args": ["/home/dwiltse/projects/cfdb_free/mcp_server/server.py"],
+      "env": {
+        "DATABRICKS_SERVER_HOSTNAME": "your-databricks-workspace.cloud.databricks.com",
+        "DATABRICKS_HTTP_PATH": "/sql/1.0/warehouses/your-warehouse-id", 
+        "DATABRICKS_ACCESS_TOKEN": "your-databricks-access-token"
+      }
+    }
+  }
+}
