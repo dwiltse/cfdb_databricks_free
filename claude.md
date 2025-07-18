@@ -94,7 +94,32 @@ Build features for predicting:
 
 
 
-\## Documentation
+\## Key Technical Learnings
+
+### DLT Constraint Syntax
+**IMPORTANT**: Use inline constraint syntax, NOT ALTER TABLE statements:
+
+```sql
+-- ✅ CORRECT - Inline constraints
+CREATE OR REFRESH STREAMING LIVE TABLE table_name
+COMMENT "Description"
+TBLPROPERTIES (...)
+CONSTRAINT constraint_name EXPECT (condition) ON VIOLATION DROP ROW
+AS SELECT ...
+
+-- ❌ INCORRECT - ALTER TABLE not supported in DLT
+ALTER TABLE LIVE.table_name 
+ADD CONSTRAINT constraint_name 
+EXPECT (condition) ON VIOLATION DROP ROW;
+```
+
+### Lakeflow Pipeline Structure
+- **Pipeline Root**: `databricks/dlt_pipeline/`
+- **Transformations**: `transformations/bronze/`, `transformations/silver/`, `transformations/gold/`
+- **Explorations**: Data analysis and monitoring views
+- **Utilities**: Reusable Python modules
+
+## Documentation
 
 I have PDF files with information about how the CFDB datasets relate to each other and field definitions.
 
