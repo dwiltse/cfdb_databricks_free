@@ -22,7 +22,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
         "quality": "bronze"
     }
 )
-@dlt.expect_or_fail("valid_game_id", "gameId IS NOT NULL")
+@dlt.expect_or_fail("valid_game_id", "game_id IS NOT NULL")
 @dlt.expect_or_drop("valid_team_id", "team IS NOT NULL")
 def game_stats_bronze():
     """
