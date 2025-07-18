@@ -23,7 +23,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
     }
 )
 @dlt.expect_or_fail("valid_season", "season IS NOT NULL")
-@dlt.expect_or_drop("valid_team_id", "teamId IS NOT NULL")
+@dlt.expect_or_drop("valid_team_id", "team IS NOT NULL")
 def season_stats_bronze():
     """
     Ingests raw season statistics CSV data from S3 with audit fields.

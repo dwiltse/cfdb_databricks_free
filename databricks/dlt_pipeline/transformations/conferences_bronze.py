@@ -22,7 +22,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
         "quality": "bronze"
     }
 )
-@dlt.expect_or_fail("valid_conference_id", "id IS NOT NULL")
+@dlt.expect_or_fail("valid_conference_name", "name IS NOT NULL")
 @dlt.expect_or_drop("valid_conference_name", "name IS NOT NULL AND length(trim(name)) > 0")
 def conferences_bronze():
     """

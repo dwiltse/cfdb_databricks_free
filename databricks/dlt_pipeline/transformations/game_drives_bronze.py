@@ -23,7 +23,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
     }
 )
 @dlt.expect_or_fail("valid_game_id", "gameId IS NOT NULL")
-@dlt.expect_or_drop("valid_drive_id", "driveId IS NOT NULL")
+@dlt.expect_or_drop("valid_drive_id", "id IS NOT NULL")
 def game_drives_bronze():
     """
     Ingests raw game drives CSV data from S3 with audit fields.

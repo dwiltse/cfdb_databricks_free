@@ -130,8 +130,8 @@ def silver_teams_cleaned():
                            )))
              .alias("twitter_handle"),
             
-            # Business data for sequencing CDC
-            F.col("data_year"),
+            # Note: teams data doesn't have data_year, so we'll use current year
+            F.year(F.current_date()).alias("data_year"),
             
             # Add derived business fields
             F.when(F.col("location.constructionYear").isNotNull(),
