@@ -2,7 +2,7 @@
 -- File: teams_gold.sql
 
 -- Current Team Dimension (Type 1 SCD)
-CREATE OR REFRESH MATERIALIZED VIEW ${catalog}.gold.dim_team (
+CREATE OR REFRESH MATERIALIZED VIEW cfdb_dev.gold.dim_team (
   CONSTRAINT valid_team_id EXPECT (team_id IS NOT NULL),
   CONSTRAINT reasonable_data_year EXPECT (data_year >= YEAR(CURRENT_DATE()) - 2),
   CONSTRAINT has_conference EXPECT (conference_name IS NOT NULL),
@@ -26,7 +26,7 @@ AS (
         PARTITION BY team_id 
         ORDER BY data_year DESC, silver_processed_at DESC NULLS LAST
       ) as row_number
-    FROM ${catalog}.silver.teams_cleaned
+    FROM cfdb_dev.silver.teams_cleaned
     WHERE team_id IS NOT NULL 
       AND school_name IS NOT NULL
       AND data_year >= YEAR(CURRENT_DATE()) - 5  -- Performance filter
@@ -72,7 +72,7 @@ AS (
 );
 
 -- Historical Team Dimension (SCD Type 2) Target Table
-CREATE OR REFRESH STREAMING TABLE ${catalog}.gold.dim_team_scd (
+CREATE OR REFRESH STREAMING TABLE cfdb_dev.gold.dim_team_scd (
   CONSTRAINT scd_valid_team_id EXPECT (team_id IS NOT NULL),
   CONSTRAINT scd_has_school EXPECT (school_name IS NOT NULL),
   CONSTRAINT scd_has_conference EXPECT (conference_name IS NOT NULL),
@@ -86,8 +86,8 @@ TBLPROPERTIES (
 );
 
 -- APPLY CHANGES INTO for Automatic SCD Type 2
-APPLY CHANGES INTO ${catalog}.gold.dim_team_scd
-FROM STREAM(${catalog}.silver.teams_cleaned)
+APPLY CHANGES INTO cfdb_dev.gold.dim_team_scd
+FROM STREAM(cfdb_dev.silver.teams_cleaned)
 KEYS (team_id)
 SEQUENCE BY data_year
 COLUMNS * EXCEPT (silver_processed_at)

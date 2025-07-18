@@ -42,5 +42,5 @@ def game_stats_bronze():
         
         # Add audit and tracking fields
         .withColumn("ingestion_timestamp", F.current_timestamp())
-        .withColumn("source_file", F.input_file_name())
+        .withColumn("source_file", F.col("_metadata.file_path"))
     )

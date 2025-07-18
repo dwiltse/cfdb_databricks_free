@@ -43,7 +43,7 @@ def plays_bronze():
         
         # Add audit and tracking fields
         .withColumn("ingestion_timestamp", F.current_timestamp())
-        .withColumn("source_file", F.input_file_name())
+        .withColumn("source_file", F.col("_metadata.file_path"))
         # Extract year from file path for partitioning
-        .withColumn("year_partition", F.regexp_extract(F.input_file_name(), r"plays/(\d{4})/", 1).cast("integer"))
+        .withColumn("year_partition", F.regexp_extract(F.col("_metadata.file_path"), r"plays/(\d{4})/", 1).cast("integer"))
     )
