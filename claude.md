@@ -115,9 +115,11 @@ EXPECT (condition) ON VIOLATION DROP ROW;
 
 ### Lakeflow Pipeline Structure
 - **Pipeline Root**: `databricks/dlt_pipeline/`
-- **Transformations**: `transformations/bronze/`, `transformations/silver/`, `transformations/gold/`
-- **Explorations**: Data analysis and monitoring views
-- **Utilities**: Reusable Python modules
+- **Transformations**: Flat structure in `transformations/` (DLT prefers no subfolders)
+- **Explorations**: Data analysis and monitoring views in `explorations/`
+- **Utilities**: Reusable Python modules in `utilities/`
+
+**Note**: DLT pipelines work better with a flat file structure in transformations rather than bronze/silver/gold subfolders.
 
 ## Documentation
 

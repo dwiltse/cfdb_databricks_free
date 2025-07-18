@@ -9,13 +9,14 @@ USE SCHEMA bronze;
 -- =====================================================
 -- TEAMS (JSON format, single folder)
 -- =====================================================
-CREATE OR REFRESH STREAMING LIVE TABLE teams_bronze
+CREATE OR REFRESH STREAMING LIVE TABLE teams_bronze (
+  CONSTRAINT valid_team_id EXPECT (id IS NOT NULL) ON VIOLATION DROP ROW
+)
 COMMENT "Raw teams data from S3 in JSON format"
 TBLPROPERTIES (
   "quality" = "bronze",
   "pipelines.autoOptimize.zOrderCols" = "id,school"
 )
-CONSTRAINT valid_team_id EXPECT (id IS NOT NULL) ON VIOLATION DROP ROW
 AS SELECT 
     *,
     current_timestamp() as ingestion_timestamp,
@@ -33,14 +34,15 @@ FROM cloud_files(
 -- =====================================================
 -- GAMES (CSV format, single folder) 
 -- =====================================================
-CREATE OR REFRESH STREAMING LIVE TABLE games_bronze
+CREATE OR REFRESH STREAMING LIVE TABLE games_bronze (
+  CONSTRAINT valid_game_id EXPECT (id IS NOT NULL) ON VIOLATION DROP ROW,
+  CONSTRAINT valid_season EXPECT (season >= 2000 AND season <= 2030) ON VIOLATION DROP ROW
+)
 COMMENT "Raw games data from S3 in CSV format"
 TBLPROPERTIES (
   "quality" = "bronze",
   "pipelines.autoOptimize.zOrderCols" = "id,season,week"
 )
-CONSTRAINT valid_game_id EXPECT (id IS NOT NULL) ON VIOLATION DROP ROW
-CONSTRAINT valid_season EXPECT (season >= 2000 AND season <= 2030) ON VIOLATION DROP ROW
 AS SELECT 
     *,
     current_timestamp() as ingestion_timestamp,
@@ -150,13 +152,14 @@ FROM cloud_files(
 -- =====================================================
 -- PLAYS (Parquet format, partitioned by year)
 -- =====================================================
-CREATE OR REFRESH STREAMING LIVE TABLE plays_bronze
+CREATE OR REFRESH STREAMING LIVE TABLE plays_bronze (
+  CONSTRAINT valid_play_game_id EXPECT (gameId IS NOT NULL) ON VIOLATION DROP ROW
+)
 COMMENT "Raw play-by-play data from S3 in Parquet format, partitioned by year"
 TBLPROPERTIES (
   "quality" = "bronze",
   "pipelines.autoOptimize.zOrderCols" = "gameId,driveId,playNumber"
 )
-CONSTRAINT valid_play_game_id EXPECT (gameId IS NOT NULL) ON VIOLATION DROP ROW
 AS SELECT 
     *,
     current_timestamp() as ingestion_timestamp,
