@@ -23,9 +23,9 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
     }
 )
 @dlt.expect_or_fail("valid_season", "season >= 2000 AND season <= YEAR(CURRENT_DATE()) + 1")
-@dlt.expect_or_fail("valid_team", "team IS NOT NULL")
+@dlt.expect_or_fail("valid_team", "team_name IS NOT NULL")
 @dlt.expect_or_fail("fbs_teams_only", "team_id IS NOT NULL")  # Only teams that exist in FBS teams table
-@dlt.expect_or_fail("valid_epa", "offense_passingPlays_ppa IS NOT NULL OR offense_rushingPlays_ppa IS NOT NULL")
+@dlt.expect_or_fail("valid_epa", "off_pass_ppa_per_play IS NOT NULL OR off_rush_ppa_per_play IS NOT NULL")
 def fact_advanced_season_stats_silver():
     """
     Advanced season-level statistics for FBS teams with pre-calculated EPA, explosiveness, and efficiency metrics.

@@ -24,7 +24,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_game_id", "game_id IS NOT NULL")
 @dlt.expect_or_fail("valid_season", "season >= 2000 AND season <= YEAR(CURRENT_DATE()) + 1")
-@dlt.expect_or_fail("valid_team", "team IS NOT NULL")
+@dlt.expect_or_fail("valid_team", "team_name IS NOT NULL")
 @dlt.expect_or_fail("fbs_games_only", "game_id IS NOT NULL")  # Links to FBS games through fact_games_silver
 def fact_advanced_game_stats_silver():
     """

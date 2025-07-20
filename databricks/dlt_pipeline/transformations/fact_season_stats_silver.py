@@ -23,10 +23,10 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
     }
 )
 @dlt.expect_or_fail("valid_season", "season >= 2000 AND season <= YEAR(CURRENT_DATE()) + 1")
-@dlt.expect_or_fail("valid_team", "team IS NOT NULL")
+@dlt.expect_or_fail("valid_team", "team_name IS NOT NULL")
 @dlt.expect_or_fail("fbs_teams_only", "team_id IS NOT NULL")  # Only teams that exist in FBS teams table
 @dlt.expect_or_fail("positive_games", "games > 0")
-@dlt.expect_or_fail("reasonable_totals", "totalYards >= 0 AND totalYardsOpponent >= 0")
+@dlt.expect_or_fail("reasonable_totals", "total_yards >= 0 AND total_yards_allowed >= 0")
 def fact_season_stats_silver():
     """
     Season-aggregated statistics for FBS teams with efficiency metrics.
