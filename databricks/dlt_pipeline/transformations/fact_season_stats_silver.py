@@ -45,9 +45,9 @@ def fact_season_stats_silver():
             "inner"  # Only include teams that exist in FBS teams table
         )
         .filter(
-            F.col("ss.season").isNotNull() &
-            F.col("ss.team").isNotNull() &
-            F.col("ss.games") > 0
+            (F.col("ss.season").isNotNull()) &
+            (F.col("ss.team").isNotNull()) &
+            (F.col("ss.games") > 0)
         )
         .select(
             # Primary identifiers

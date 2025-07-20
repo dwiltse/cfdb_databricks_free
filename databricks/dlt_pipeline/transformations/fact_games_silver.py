@@ -40,9 +40,9 @@ def fact_games_silver():
             (F.col("home_classification") == "fbs") | (F.col("away_classification") == "fbs")
         )
         .filter(
-            F.col("home_points").isNotNull() & 
-            F.col("away_points").isNotNull() &
-            F.col("id").isNotNull()
+            (F.col("home_points").isNotNull()) & 
+            (F.col("away_points").isNotNull()) &
+            (F.col("id").isNotNull())
         )
         .select(
             # Primary identifiers

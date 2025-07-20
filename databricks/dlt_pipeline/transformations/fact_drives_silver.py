@@ -39,7 +39,7 @@ def fact_drives_silver():
     return (
         drives.alias("d")
         .join(games.alias("g"), F.col("d.gameId") == F.col("g.game_id"), "inner")
-        .filter(F.col("d.gameId").isNotNull() & F.col("d.id").isNotNull())
+        .filter((F.col("d.gameId").isNotNull()) & (F.col("d.id").isNotNull()))
         .select(
             # Primary identifiers
             F.col("d.gameId").alias("game_id"),

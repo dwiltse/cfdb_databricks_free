@@ -41,9 +41,9 @@ def fact_advanced_game_stats_silver():
         advanced_game_stats.alias("ags")
         .join(games.alias("g"), F.col("ags.gameId") == F.col("g.game_id"), "inner")
         .filter(
-            F.col("ags.gameId").isNotNull() &
-            F.col("ags.team").isNotNull() &
-            F.col("ags.season").isNotNull()
+            (F.col("ags.gameId").isNotNull()) &
+            (F.col("ags.team").isNotNull()) &
+            (F.col("ags.season").isNotNull())
         )
         .select(
             # Primary identifiers
