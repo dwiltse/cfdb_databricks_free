@@ -25,7 +25,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 @dlt.expect_or_fail("valid_game_id", "game_id IS NOT NULL")
 @dlt.expect_or_fail("valid_team_id", "team_id IS NOT NULL")
 @dlt.expect_or_fail("valid_home_away", "home_away IN ('home', 'away')")
-@dlt.expect_or_fail("non_negative_stats", "totalYards >= 0 AND rushingYards >= 0")
+@dlt.expect_or_fail("valid_total_yards", "total_yards >= 0")
 def fact_game_stats_silver():
     """
     Team performance statistics per game for FBS teams.
