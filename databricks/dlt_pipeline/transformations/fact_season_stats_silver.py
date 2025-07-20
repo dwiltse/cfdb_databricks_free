@@ -112,7 +112,7 @@ def fact_season_stats_silver():
             F.col("ss.penaltiesOpponent").alias("opponent_penalties"),
             F.col("ss.penaltyYardsOpponent").alias("opponent_penalty_yards"),
             
-            # Time of possession
+            # Time of possession - already in seconds for season stats
             F.col("ss.possessionTime").alias("possession_time_seconds"),
             F.col("ss.possessionTimeOpponent").alias("opponent_possession_time_seconds"),
             

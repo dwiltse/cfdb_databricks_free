@@ -108,7 +108,13 @@ def fact_game_stats_silver():
             F.col("gs.totalPenaltiesYards").alias("total_penalties_yards"),
             
             # Time management
-            F.col("gs.possessionTime").alias("possession_time"),
+            F.col("gs.possessionTime").alias("possession_time_raw"),
+            # Convert possession time from "MM:SS" to total seconds
+            F.when(
+                F.col("gs.possessionTime").isNotNull() & F.col("gs.possessionTime").contains(":"),
+                (F.split(F.col("gs.possessionTime"), ":")[0].cast("int") * 60) + 
+                F.split(F.col("gs.possessionTime"), ":")[1].cast("int")
+            ).otherwise(F.lit(None)).alias("possession_time_seconds"),
             
             # Game context from silver games
             F.col("g.margin").alias("final_margin"),

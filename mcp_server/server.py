@@ -8,6 +8,7 @@ import logging
 from typing import Dict, List, Any, Optional
 from mcp.server import Server
 from mcp.server.models import InitializationOptions
+from mcp.server import NotificationOptions
 import mcp.server.stdio
 import mcp.types as types
 from databricks import sql
@@ -160,13 +161,31 @@ class CFDBServer:
         """Execute SQL query against CFDB data"""
         await self._connect_databricks()
         
-        # Add catalog/schema context and limit
-        full_query = f"""
-        USE CATALOG {self.databricks_config['catalog']};
-        USE SCHEMA {self.databricks_config['schema']};
-        {query}
-        LIMIT {limit};
-        """
+        # Add catalog.schema prefix to table names if not already present
+        catalog = self.databricks_config['catalog']
+        schema = self.databricks_config['schema']
+        
+        # Simple table name replacement for common bronze tables
+        table_replacements = {
+            'teams_bronze': f'{catalog}.{schema}.teams_bronze',
+            'games_bronze': f'{catalog}.{schema}.games_bronze', 
+            'plays_bronze': f'{catalog}.{schema}.plays_bronze',
+            'game_drives_bronze': f'{catalog}.{schema}.game_drives_bronze',
+            'game_stats_bronze': f'{catalog}.{schema}.game_stats_bronze',
+            'season_stats_bronze': f'{catalog}.{schema}.season_stats_bronze',
+            'conferences_bronze': f'{catalog}.{schema}.conferences_bronze'
+        }
+        
+        modified_query = query
+        for table, full_table in table_replacements.items():
+            if table in modified_query and full_table not in modified_query:
+                modified_query = modified_query.replace(table, full_table)
+        
+        # Add limit to query if not already present
+        if "LIMIT" not in modified_query.upper():
+            full_query = f"{modified_query} LIMIT {limit}"
+        else:
+            full_query = modified_query
         
         try:
             self.cursor.execute(full_query)
@@ -348,8 +367,8 @@ Silver Layer Suggestions for Plays:
                     server_name="cfdb-data-server",
                     server_version="1.0.0",
                     capabilities=self.server.get_capabilities(
-                        notification_options=None,
-                        experimental_capabilities=None,
+                        notification_options=NotificationOptions(),
+                        experimental_capabilities={}
                     ),
                 ),
             )

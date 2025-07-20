@@ -4,9 +4,9 @@
       "command": "python",
       "args": ["/home/dwiltse/projects/cfdb_free/mcp_server/server.py"],
       "env": {
-        "DATABRICKS_SERVER_HOSTNAME": "your-databricks-workspace.cloud.databricks.com",
-        "DATABRICKS_HTTP_PATH": "/sql/1.0/warehouses/your-warehouse-id", 
-        "DATABRICKS_ACCESS_TOKEN": "your-databricks-access-token"
+        "DATABRICKS_SERVER_HOSTNAME": "dbc-08c10e87-023f.cloud.databricks.com",
+        "DATABRICKS_HTTP_PATH": "/sql/1.0/warehouses/8804e40a7a070e15", 
+        "DATABRICKS_ACCESS_TOKEN": "your_databricks_token_here"
       }
     }
   }
