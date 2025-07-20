@@ -1,0 +1,62 @@
+# DLT Pipeline Configuration for Asset Bundle
+resources:
+  pipelines:
+    cfdb_analytics:
+      name: "CFDB Analytics Pipeline - ${bundle.target}"
+      catalog: ${var.catalog}
+      target: ${var.catalog}
+      
+      configuration:
+        catalog: ${var.catalog}
+        pipelines.trigger.interval: "60 minutes"
+        
+      libraries:
+        # Bronze layer transformations
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/teams_bronze.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/games_bronze.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/season_stats_bronze.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/game_stats_bronze.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/drives_bronze.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/plays_bronze.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/advanced_season_stats_bronze.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/advanced_game_stats_bronze.py
+            
+        # Silver layer transformations
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/fact_games_silver.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/fact_season_stats_silver.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/fact_game_stats_silver.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/fact_drives_silver.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/fact_advanced_season_stats_silver.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/fact_advanced_game_stats_silver.py
+            
+        # Gold layer transformations
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/fact_game_predictions_gold.py
+        - file:
+            path: ../../databricks/dlt_pipeline/transformations/dim_team_season_performance_gold.py
+      
+      clusters:
+        - label: default
+          autoscale:
+            min_workers: 1
+            max_workers: 5
+          node_type_id: i3.xlarge
+          spark_version: 13.3.x-scala2.12
+          
+      development: true
+      photon: false
+      continuous: false

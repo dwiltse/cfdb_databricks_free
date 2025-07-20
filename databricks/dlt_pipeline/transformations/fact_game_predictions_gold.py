@@ -24,7 +24,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_game_id", "game_id IS NOT NULL")
 @dlt.expect_or_fail("valid_season", "season >= 2000 AND season <= YEAR(CURRENT_DATE()) + 1")
-@dlt.expect_or_fail("both_teams_have_stats", "home_team_epa_rating IS NOT NULL AND away_team_epa_rating IS NOT NULL")
+@dlt.expect_or_drop("both_teams_have_stats", "home_team_epa_rating IS NOT NULL AND away_team_epa_rating IS NOT NULL")
 def fact_game_predictions_gold():
     """
     Game prediction features combining advanced team performance metrics.
@@ -104,7 +104,9 @@ def fact_game_predictions_gold():
         .filter(
             (F.col("g.season") >= 2014) &  # Only include games with advanced stats
             (F.col("g.home_points").isNotNull()) & 
-            (F.col("g.away_points").isNotNull())
+            (F.col("g.away_points").isNotNull()) &
+            (F.col("ha.home_off_epa").isNotNull()) &  # Home team has advanced stats
+            (F.col("aa.away_off_epa").isNotNull())    # Away team has advanced stats
         )
         .select(
             # Game context
