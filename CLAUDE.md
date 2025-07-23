@@ -35,3 +35,29 @@
 - Focus on FBS teams including games against lower divisions
 - Use advanced analytics with EPA metrics for sophisticated analysis
 - Follow medallion architecture: Bronze → Silver → Gold
+
+## Databricks Apps Development
+
+### Web Application Framework
+- **Cookbook Reference**: https://apps-cookbook.dev/docs/category/streamlit
+- **Supported Frameworks**: Streamlit (dashboards), FastAPI (APIs), Dash (advanced analytics)
+- **Deployment**: Databricks Apps with serverless compute (scales to zero)
+
+### Integration Patterns
+- **Data Access**: Use `databricks.sql.connect()` for Unity Catalog queries
+- **Authentication**: Implement OBO (on-behalf-of-user) for user-specific access
+- **ML Serving**: Deploy prediction models via Databricks Apps endpoints
+- **Cost Optimization**: Leverage auto-scaling serverless compute
+
+### CFDB App Ideas
+- Interactive Nebraska prediction dashboard (Streamlit)
+- Team comparison analytics (Dash)
+- Prediction API service (FastAPI)
+- Real-time game analysis tools
+
+### Development Workflow
+1. Build locally using cookbook examples
+2. Test with sample CFDB data  
+3. Deploy to Databricks Apps environment
+4. Configure Unity Catalog permissions
+5. Enable user authentication

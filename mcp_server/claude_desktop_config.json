@@ -1,13 +1,9 @@
 {
   "mcpServers": {
     "cfdb-data": {
-      "command": "python",
+      "command": "/home/dwiltse/projects/cfdb_free/mcp_server/venv/bin/python",
       "args": ["/home/dwiltse/projects/cfdb_free/mcp_server/server.py"],
-      "env": {
-        "DATABRICKS_SERVER_HOSTNAME": "${DATABRICKS_SERVER_HOSTNAME}",
-        "DATABRICKS_HTTP_PATH": "${DATABRICKS_HTTP_PATH}", 
-        "DATABRICKS_ACCESS_TOKEN": "${DATABRICKS_ACCESS_TOKEN}"
-      }
+      "cwd": "/home/dwiltse/projects/cfdb_free/mcp_server"
     }
   }
 }

@@ -13,6 +13,10 @@ import mcp.server.stdio
 import mcp.types as types
 from databricks import sql
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +28,21 @@ class CFDBServer:
         self.connection = None
         self.cursor = None
         
+        # Validate required environment variables
+        required_env_vars = [
+            "DATABRICKS_SERVER_HOSTNAME",
+            "DATABRICKS_HTTP_PATH", 
+            "DATABRICKS_ACCESS_TOKEN"
+        ]
+        
+        missing_vars = []
+        for var in required_env_vars:
+            if not os.getenv(var):
+                missing_vars.append(var)
+        
+        if missing_vars:
+            raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}. Please check your .env file.")
+        
         # Databricks connection parameters
         self.databricks_config = {
             "server_hostname": os.getenv("DATABRICKS_SERVER_HOSTNAME"),
@@ -33,7 +52,26 @@ class CFDBServer:
             "schema": "bronze"
         }
         
+        logger.info(f"Initialized CFDB Server with hostname: {self.databricks_config['server_hostname']}")
         self._register_handlers()
+    
+    def _cleanup_connection(self):
+        """Clean up database connections"""
+        if self.cursor:
+            try:
+                self.cursor.close()
+            except:
+                pass
+            self.cursor = None
+        
+        if self.connection:
+            try:
+                self.connection.close()
+            except:
+                pass
+            self.connection = None
+        
+        logger.info("Database connections cleaned up")
     
     def _register_handlers(self):
         """Register MCP handlers"""
@@ -144,18 +182,29 @@ class CFDBServer:
     
     async def _connect_databricks(self):
         """Establish connection to Databricks"""
-        if self.connection is None:
-            try:
-                self.connection = sql.connect(
-                    server_hostname=self.databricks_config["server_hostname"],
-                    http_path=self.databricks_config["http_path"],
-                    access_token=self.databricks_config["access_token"]
-                )
-                self.cursor = self.connection.cursor()
-                logger.info("Connected to Databricks")
-            except Exception as e:
-                logger.error(f"Failed to connect to Databricks: {str(e)}")
-                raise
+        # Always create a fresh connection to avoid session handle issues
+        try:
+            # Close existing connection if it exists
+            if self.connection:
+                try:
+                    self.connection.close()
+                except:
+                    pass
+                self.connection = None
+                self.cursor = None
+            
+            self.connection = sql.connect(
+                server_hostname=self.databricks_config["server_hostname"],
+                http_path=self.databricks_config["http_path"],
+                access_token=self.databricks_config["access_token"]
+            )
+            self.cursor = self.connection.cursor()
+            logger.info("Connected to Databricks")
+        except Exception as e:
+            logger.error(f"Failed to connect to Databricks: {str(e)}")
+            self.connection = None
+            self.cursor = None
+            raise
     
     async def _query_cfdb_data(self, query: str, limit: int) -> List[types.TextContent]:
         """Execute SQL query against CFDB data"""
@@ -214,6 +263,9 @@ class CFDBServer:
                 type="text",
                 text=f"Query failed: {str(e)}"
             )]
+        finally:
+            # Clean up connection after each query to prevent session handle issues
+            self._cleanup_connection()
     
     async def _get_table_schema(self, table_name: str) -> List[types.TextContent]:
         """Get schema for specified table"""
@@ -236,6 +288,9 @@ class CFDBServer:
                 type="text",
                 text=f"Failed to get schema for {table_name}: {str(e)}"
             )]
+        finally:
+            # Clean up connection after each query to prevent session handle issues
+            self._cleanup_connection()
     
     async def _get_data_summary(self) -> List[types.TextContent]:
         """Get summary of all CFDB data"""
@@ -263,6 +318,9 @@ class CFDBServer:
                 type="text",
                 text=f"Failed to get data summary: {str(e)}"
             )]
+        finally:
+            # Clean up connection after each query to prevent session handle issues
+            self._cleanup_connection()
     
     async def _suggest_silver_layer(self, focus_area: str) -> List[types.TextContent]:
         """Suggest silver layer transformations based on bronze data analysis"""

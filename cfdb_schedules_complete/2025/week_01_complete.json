@@ -1,0 +1,180 @@
+{
+  "week": 1,
+  "season": 2025,
+  "dates": "August 28-31, 2025",
+  "scraped_timestamp": "2025-01-23T16:45:00Z",
+  "source": "espn_webfetch_complete",
+  "games": [
+    {
+      "date": "2025-08-23",
+      "games": [
+        {
+          "away_team": "Idaho State",
+          "home_team": "UNLV",
+          "venue": "Allegiant Stadium, Las Vegas, NV",
+          "time": "TBD",
+          "tv_network": null,
+          "betting_lines": null
+        },
+        {
+          "away_team": "Iowa State", 
+          "home_team": "Kansas State",
+          "venue": "Aviva Stadium, Dublin, Ireland",
+          "time": "12:00 PM",
+          "tv_network": "ESPN",
+          "betting_lines": "KSU -3, O/U 49.5"
+        },
+        {
+          "away_team": "Fresno State",
+          "home_team": "Kansas", 
+          "venue": "David Booth Kansas Memorial Stadium, Lawrence, KS",
+          "time": "6:30 PM",
+          "tv_network": "FOX",
+          "betting_lines": "KU -13.5, O/U 51.5"
+        },
+        {
+          "away_team": "Sam Houston",
+          "home_team": "Western Kentucky",
+          "venue": "Houchens Industries-L.T. Smith Stadium, Bowling Green, KY",
+          "time": "7:00 PM", 
+          "tv_network": "CBSSN",
+          "betting_lines": "WKU -9.5"
+        },
+        {
+          "away_team": "Stanford",
+          "home_team": "Hawai'i",
+          "venue": "Clarence T.C. Ching Athletics Complex, Honolulu, HI",
+          "time": "7:30 PM",
+          "tv_network": "CBS", 
+          "betting_lines": "STAN -1, O/U 55.5"
+        }
+      ]
+    },
+    {
+      "date": "2025-08-28",
+      "games": [
+        {
+          "away_team": "Stony Brook",
+          "home_team": "San Diego State",
+          "time": "TBD"
+        },
+        {
+          "away_team": "Boise State",
+          "home_team": "South Florida",
+          "time": "5:30 PM",
+          "tv_network": "ESPN",
+          "betting_lines": "Boise State -8.5, O/U: 63.5"
+        },
+        {
+          "away_team": "Ohio",
+          "home_team": "Rutgers", 
+          "time": "6:00 PM",
+          "tv_network": "BTN",
+          "betting_lines": "Rutgers -10.5, O/U: 47.5"
+        },
+        {
+          "away_team": "Lafayette",
+          "home_team": "Bowling Green",
+          "time": "6:00 PM",
+          "tv_network": "ESPN+"
+        },
+        {
+          "away_team": "East Carolina",
+          "home_team": "NC State",
+          "time": "7:00 PM",
+          "tv_network": "ACC Network",
+          "betting_lines": "NC State -12.5, O/U: 56.5"
+        },
+        {
+          "away_team": "Jacksonville State",
+          "home_team": "UCF",
+          "time": "7:00 PM", 
+          "tv_network": "ESPN+",
+          "betting_lines": "UCF -16.5, O/U: 56.5"
+        },
+        {
+          "away_team": "Delaware State",
+          "home_team": "Delaware",
+          "time": "7:00 PM",
+          "tv_network": "ESPN+"
+        },
+        {
+          "away_team": "St. Francis (PA)",
+          "home_team": "UL Monroe",
+          "time": "7:00 PM",
+          "tv_network": "ESPN+"
+        },
+        {
+          "away_team": "Wyoming",
+          "home_team": "Akron",
+          "time": "7:00 PM",
+          "tv_network": "ESPN+",
+          "betting_lines": "Wyoming -8.5, O/U: 49.5"
+        },
+        {
+          "away_team": "Central Arkansas",
+          "home_team": "Missouri",
+          "time": "7:30 PM",
+          "tv_network": "SEC Network"
+        },
+        {
+          "away_team": "Elon",
+          "home_team": "Duke",
+          "time": "7:30 PM",
+          "tv_network": "ESPN+/ACC Extra"
+        },
+        {
+          "away_team": "UT Martin",
+          "home_team": "Oklahoma State",
+          "time": "7:30 PM",
+          "tv_network": "ESPN+"
+        },
+        {
+          "away_team": "Buffalo",
+          "home_team": "Minnesota",
+          "time": "8:00 PM",
+          "tv_network": "FS1",
+          "betting_lines": "Minnesota -17.5, O/U: 45.5"
+        },
+        {
+          "away_team": "Stephen F. Austin",
+          "home_team": "Houston",
+          "time": "8:00 PM",
+          "tv_network": "ESPN+"
+        },
+        {
+          "away_team": "Alabama State",
+          "home_team": "UAB",
+          "time": "8:30 PM",
+          "tv_network": "ESPN+"
+        },
+        {
+          "away_team": "Nebraska",
+          "home_team": "Cincinnati",
+          "time": "9:00 PM",
+          "tv_network": "ESPN",
+          "venue": "GEHA Field at Arrowhead Stadium, Kansas City, MO",
+          "betting_lines": "Nebraska -7, O/U: 51.5",
+          "neutral_site": true
+        },
+        {
+          "away_team": "Miami (OH)",
+          "home_team": "Wisconsin",
+          "time": "9:00 PM",
+          "tv_network": "BTN",
+          "betting_lines": "Wisconsin -17.5, O/U: 41.5"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_games": 22,
+    "games_with_betting_lines": 11,
+    "games_with_tv": 18,
+    "notable_games": [
+      "Nebraska @ Cincinnati - Neutral site in Kansas City",
+      "Iowa State @ Kansas State - International game in Dublin",
+      "Boise State @ South Florida - High-scoring game (O/U 63.5)"
+    ]
+  }
+}
