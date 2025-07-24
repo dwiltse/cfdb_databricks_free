@@ -1,0 +1,120 @@
+{
+  "season": 2025,
+  "team": "Nebraska",
+  "schedule": [
+    {
+      "week": 1,
+      "date": "2025-08-28",
+      "opponent": "Cincinnati", 
+      "home_away": "away",
+      "venue": "GEHA Field at Arrowhead Stadium, Kansas City, MO",
+      "time": "8:00 PM",
+      "neutral_site": true
+    },
+    {
+      "week": 2,
+      "date": "2025-09-06", 
+      "opponent": "Akron",
+      "home_away": "home",
+      "venue": "Memorial Stadium, Lincoln, NE",
+      "time": "6:30 PM",
+      "neutral_site": false
+    },
+    {
+      "week": 3,
+      "date": "2025-09-13",
+      "opponent": "Houston Christian", 
+      "home_away": "home",
+      "venue": "Memorial Stadium, Lincoln, NE",
+      "time": "11:00 AM",
+      "neutral_site": false
+    },
+    {
+      "week": 4,
+      "date": "2025-09-20",
+      "opponent": "Michigan",
+      "home_away": "home", 
+      "venue": "Memorial Stadium, Lincoln, NE",
+      "time": "2:30 PM",
+      "neutral_site": false
+    },
+    {
+      "week": 6,
+      "date": "2025-10-04",
+      "opponent": "Michigan State",
+      "home_away": "home",
+      "venue": "Memorial Stadium, Lincoln, NE", 
+      "time": "TBA",
+      "neutral_site": false
+    },
+    {
+      "week": 7,
+      "date": "2025-10-11",
+      "opponent": "Maryland",
+      "home_away": "away",
+      "venue": "SECU Stadium, College Park, MD",
+      "time": "TBA", 
+      "neutral_site": false
+    },
+    {
+      "week": 8,
+      "date": "2025-10-17",
+      "opponent": "Minnesota",
+      "home_away": "away",
+      "venue": "Huntington Bank Stadium, Minneapolis, MN",
+      "time": "7:00 PM",
+      "neutral_site": false
+    },
+    {
+      "week": 9,
+      "date": "2025-10-25",
+      "opponent": "Northwestern",
+      "home_away": "home",
+      "venue": "Memorial Stadium, Lincoln, NE",
+      "time": "TBA",
+      "neutral_site": false
+    },
+    {
+      "week": 10,
+      "date": "2025-11-01", 
+      "opponent": "USC",
+      "home_away": "home",
+      "venue": "Memorial Stadium, Lincoln, NE",
+      "time": "TBA",
+      "neutral_site": false
+    },
+    {
+      "week": 11,
+      "date": "2025-11-08",
+      "opponent": "UCLA",
+      "home_away": "away", 
+      "venue": "Rose Bowl, Pasadena, CA",
+      "time": "TBA",
+      "neutral_site": false
+    },
+    {
+      "week": 13,
+      "date": "2025-11-22",
+      "opponent": "Penn State",
+      "home_away": "away",
+      "venue": "Beaver Stadium, University Park, PA", 
+      "time": "TBA",
+      "neutral_site": false
+    },
+    {
+      "week": 14,
+      "date": "2025-11-28",
+      "opponent": "Iowa",
+      "home_away": "home",
+      "venue": "Memorial Stadium, Lincoln, NE",
+      "time": "11:00 AM",
+      "neutral_site": false
+    }
+  ],
+  "summary": {
+    "total_games": 12,
+    "home_games": 7,
+    "away_games": 5,
+    "neutral_site_games": 1
+  }
+}
