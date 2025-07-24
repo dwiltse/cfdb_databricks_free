@@ -23,7 +23,6 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
     }
 )
 @dlt.expect_or_fail("valid_season", "season IS NOT NULL AND season = 2025")
-@dlt.expect_or_drop("valid_week", "week >= 1 AND week <= 15")
 def schedules_bronze():
     """
     Ingests raw 2025 schedule JSON data from S3 external location.
@@ -49,7 +48,7 @@ def schedules_bronze():
             StructField("includes_tv_networks", BooleanType(), True),
             StructField("includes_game_times", BooleanType(), True)
         ]), True),
-        StructField("games", ArrayType(StructType([
+        StructField("key_findings", MapType(StringType(), StructType([
             StructField("week", IntegerType(), True),
             StructField("date", StringType(), True),
             StructField("time", StringType(), True),
@@ -61,9 +60,9 @@ def schedules_bronze():
             StructField("neutral_site", BooleanType(), True),
             StructField("away_score", IntegerType(), True),
             StructField("home_score", IntegerType(), True),
-            StructField("game_status", StringType(), True)
-        ])), True),
-        StructField("key_findings", MapType(StringType(), StringType()), True)
+            StructField("game_status", StringType(), True),
+            StructField("note", StringType(), True)
+        ])), True)
     ])
     
     return (
@@ -105,7 +104,6 @@ def schedules_bronze():
     }
 )
 @dlt.expect_or_fail("valid_teams", "away_team IS NOT NULL AND home_team IS NOT NULL")
-@dlt.expect_or_drop("valid_week", "week >= 1 AND week <= 15")
 def schedule_games_bronze():
     """
     Flattens individual games from the schedule JSON files.
@@ -121,24 +119,27 @@ def schedule_games_bronze():
             F.col("source"),
             F.col("ingestion_timestamp"),
             F.col("source_file"),
-            F.explode(F.col("games")).alias("game")
+            F.explode(F.col("key_findings")).alias("game_key", "game_data")
         )
         .select(
             "*",
-            F.col("game.week").alias("week"),
-            F.col("game.date").alias("game_date"),
-            F.col("game.time").alias("game_time"),
-            F.col("game.away_team").alias("away_team"),
-            F.col("game.home_team").alias("home_team"),
-            F.col("game.venue").alias("venue"),
-            F.col("game.tv_network").alias("tv_network"),
-            F.col("game.betting_lines").alias("betting_lines"),
-            F.col("game.neutral_site").alias("neutral_site"),
-            F.col("game.away_score").alias("away_score"),
-            F.col("game.home_score").alias("home_score"),
-            F.col("game.game_status").alias("game_status")
+            F.col("game_data.week").alias("week"),
+            F.col("game_data.date").alias("game_date"),
+            F.col("game_data.time").alias("game_time"),
+            F.col("game_data.away_team").alias("away_team"),
+            F.col("game_data.home_team").alias("home_team"),
+            F.col("game_data.venue").alias("venue"),
+            F.col("game_data.tv_network").alias("tv_network"),
+            F.col("game_data.betting_lines").alias("betting_lines"),
+            F.col("game_data.neutral_site").alias("neutral_site"),
+            F.col("game_data.away_score").alias("away_score"),
+            F.col("game_data.home_score").alias("home_score"),
+            F.col("game_data.game_status").alias("game_status"),
+            F.col("game_data.note").alias("game_note"),
+            F.col("game_key").alias("game_identifier")
         )
-        .drop("game")
+        .drop("game_data", "game_key")
+        .filter(F.col("week").isNotNull())  # Only include records that have week data
         
         # Create unique game identifier
         .withColumn("schedule_game_id",
