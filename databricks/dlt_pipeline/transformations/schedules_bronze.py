@@ -110,7 +110,7 @@ def schedule_games_bronze():
     Each row represents a single scheduled game with all metadata.
     """
     
-    schedule_df = dlt.read_stream("schedules_bronze")
+    schedule_df = dlt.read_stream(f"{catalog}.bronze.schedules_bronze")
     
     return (
         schedule_df
