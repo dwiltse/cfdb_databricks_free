@@ -9,11 +9,11 @@ from pyspark.sql.types import *
 catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not specified
 
 # =============================================================================
-# BRONZE LAYER - Raw games data ingestion (games_bronze)
+# BRONZE LAYER - Raw games data ingestion
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.bronze.games_bronze",
+    name=f"{catalog}.bronze_raw.games",
     comment="Bronze layer - Raw games data from CSV files with audit fields",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -24,7 +24,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_game_id", "id IS NOT NULL")
 @dlt.expect_or_drop("valid_season", "season >= 2000 AND season <= 2030")
-def games_bronze():
+def games():
     """
     Ingests raw games CSV data from S3 with audit fields.
     

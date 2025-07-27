@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.silver.fact_game_stats_silver",
+    name=f"{catalog}.silver_clean.game_stats",
     comment="Silver layer - Team statistics per game for FBS teams with calculated efficiency metrics",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -26,15 +26,15 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 @dlt.expect_or_fail("valid_team_id", "team_id IS NOT NULL")
 @dlt.expect_or_fail("valid_home_away", "home_away IN ('home', 'away')")
 @dlt.expect_or_fail("valid_total_yards", "total_yards >= 0")
-def fact_game_stats_silver():
+def game_stats():
     """
     Team performance statistics per game for FBS teams.
     
     Only includes stats from games involving FBS teams with calculated efficiency metrics.
     """
     
-    game_stats = dlt.read(f"{catalog}.bronze.game_stats_bronze")
-    games = dlt.read(f"{catalog}.silver.fact_games_silver")
+    game_stats = dlt.read(f"{catalog}.bronze_raw.game_stats")
+    games = dlt.read(f"{catalog}.silver_clean.games")
     
     return (
         game_stats.alias("gs")

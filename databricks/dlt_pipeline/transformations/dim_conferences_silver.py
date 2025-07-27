@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.silver.dim_conferences_silver",
+    name=f"{catalog}.silver_clean.conferences",
     comment="Silver layer - Conference dimension with classification and tier information",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -24,13 +24,13 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_conference_name", "conference_name IS NOT NULL")
 @dlt.expect_or_fail("valid_division", "division_level IN ('FBS', 'FCS', 'Other')")
-def dim_conferences_silver():
+def conferences():
     """
     Conference dimension with tier classifications and competitive levels.
     """
     
     return (
-        dlt.read(f"{catalog}.bronze.conferences_bronze")
+        dlt.read(f"{catalog}.bronze_raw.conferences")
         .filter(F.col("name").isNotNull())
         .select(
             # Primary identifiers

@@ -222,13 +222,17 @@ class CFDBServer:
             'game_drives_bronze': f'{catalog}.{schema}.game_drives_bronze',
             'game_stats_bronze': f'{catalog}.{schema}.game_stats_bronze',
             'season_stats_bronze': f'{catalog}.{schema}.season_stats_bronze',
-            'conferences_bronze': f'{catalog}.{schema}.conferences_bronze'
+            'conferences_bronze': f'{catalog}.{schema}.conferences_bronze',
+            'nebraska_games_bronze': f'{catalog}.{schema}.nebraska_games_bronze',
+            'nebraska_schedule_bronze': f'{catalog}.{schema}.nebraska_schedule_bronze'
         }
         
         modified_query = query
-        for table, full_table in table_replacements.items():
-            if table in modified_query and full_table not in modified_query:
-                modified_query = modified_query.replace(table, full_table)
+        # Only do replacements if the query doesn't already contain full table names
+        if f'{catalog}.{schema}.' not in modified_query:
+            for table, full_table in table_replacements.items():
+                if table in modified_query:
+                    modified_query = modified_query.replace(table, full_table)
         
         # Add limit to query if not already present
         if "LIMIT" not in modified_query.upper():

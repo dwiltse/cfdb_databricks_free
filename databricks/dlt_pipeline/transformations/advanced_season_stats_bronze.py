@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.bronze.advanced_season_stats_bronze",
+    name=f"{catalog}.bronze_raw.advanced_season_stats",
     comment="Bronze layer - Raw advanced season statistics data from CSV files with audit fields",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -24,7 +24,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_season", "season >= 2000 AND season <= 2030")
 @dlt.expect_or_fail("valid_team", "team IS NOT NULL")
-def advanced_season_stats_bronze():
+def advanced_season_stats():
     """
     Ingests raw advanced season statistics CSV data from S3 with audit fields.
     

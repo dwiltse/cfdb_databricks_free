@@ -9,11 +9,11 @@ from pyspark.sql.types import *
 catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not specified
 
 # =============================================================================
-# BRONZE LAYER - Raw teams data ingestion (teams_bronze)
+# BRONZE LAYER - Raw teams data ingestion
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.bronze.teams_bronze",
+    name=f"{catalog}.bronze_raw.teams",
     comment="Bronze layer - Raw teams data from JSON files with audit fields",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -24,7 +24,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_team_id", "id IS NOT NULL")
 @dlt.expect_or_drop("valid_school_name", "school IS NOT NULL AND length(trim(school)) > 0")
-def teams_bronze():
+def teams():
     """
     Ingests raw teams JSON data from S3 with audit fields.
     

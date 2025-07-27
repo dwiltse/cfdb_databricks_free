@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.silver.fact_advanced_game_stats_silver",
+    name=f"{catalog}.silver_clean.advanced_game_stats",
     comment="Silver layer - FBS team advanced game statistics with EPA, explosiveness, and success rates per game",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -26,7 +26,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 @dlt.expect_or_fail("valid_season", "season >= 2000 AND season <= YEAR(CURRENT_DATE()) + 1")
 @dlt.expect_or_fail("valid_team", "team_name IS NOT NULL")
 @dlt.expect_or_fail("fbs_games_only", "game_id IS NOT NULL")  # Links to FBS games through fact_games_silver
-def fact_advanced_game_stats_silver():
+def advanced_game_stats():
     """
     Advanced game-level statistics for FBS teams with pre-calculated EPA, explosiveness, and efficiency metrics.
     
@@ -34,8 +34,8 @@ def fact_advanced_game_stats_silver():
     success rates, explosiveness, line yards, and defensive efficiency measures.
     """
     
-    advanced_game_stats = dlt.read(f"{catalog}.bronze.advanced_game_stats_bronze")
-    games = dlt.read(f"{catalog}.silver.fact_games_silver")
+    advanced_game_stats = dlt.read(f"{catalog}.bronze_raw.advanced_game_stats")
+    games = dlt.read(f"{catalog}.silver_clean.games")
     
     return (
         advanced_game_stats.alias("ags")

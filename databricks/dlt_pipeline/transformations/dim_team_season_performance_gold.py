@@ -33,12 +33,12 @@ def dim_team_season_performance_gold():
     contextual performance indicators into a single analytics-ready table.
     """
     
-    teams = dlt.read(f"{catalog}.bronze.teams_bronze")
-    advanced_stats = dlt.read(f"{catalog}.silver.fact_advanced_season_stats_silver")
-    traditional_stats = dlt.read(f"{catalog}.silver.fact_season_stats_silver")
+    teams = dlt.read(f"{catalog}.bronze_raw.teams")
+    advanced_stats = dlt.read(f"{catalog}.silver_clean.advanced_season_stats")
+    traditional_stats = dlt.read(f"{catalog}.silver_clean.season_stats")
     
     # Calculate game results summary
-    games = dlt.read(f"{catalog}.silver.fact_games_silver")
+    games = dlt.read(f"{catalog}.silver_clean.games")
     
     # Home game results
     home_results = (

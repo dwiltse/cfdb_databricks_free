@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.silver.fact_games_silver",
+    name=f"{catalog}.silver_clean.games",
     comment="Silver layer - FBS game results with calculated performance metrics",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -27,7 +27,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 @dlt.expect_or_fail("fbs_teams_only", "home_classification = 'fbs' OR away_classification = 'fbs'")
 @dlt.expect_or_fail("completed_games", "home_points IS NOT NULL AND away_points IS NOT NULL")
 @dlt.expect_or_fail("valid_scores", "home_points >= 0 AND away_points >= 0")
-def fact_games_silver():
+def games():
     """
     Core FBS game results with calculated metrics for analytics.
     
@@ -35,7 +35,7 @@ def fact_games_silver():
     """
     
     return (
-        dlt.read(f"{catalog}.bronze.games_bronze")
+        dlt.read(f"{catalog}.bronze_raw.games")
         .filter(
             (F.col("home_classification") == "fbs") | (F.col("away_classification") == "fbs")
         )

@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.silver.teams_cleaned",
+    name=f"{catalog}.silver_clean.teams",
     comment="Silver layer - Cleaned and flattened teams data prepared for CDC gold layer",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -33,7 +33,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")
     venue_capacity IS NULL OR 
     (venue_capacity >= 1000 AND venue_capacity <= 200000)
 """)
-def silver_teams_cleaned():
+def teams():
     """
     Transforms bronze teams_bronze data into clean, flattened format for CDC processing.
     Removes technical metadata and standardizes business data.
@@ -41,7 +41,7 @@ def silver_teams_cleaned():
     """
     
     return (
-        dlt.read_stream(f"{catalog}.bronze.teams_bronze")
+        dlt.read_stream(f"{catalog}.bronze_raw.teams")
         .select(
             # Core team identifiers
             F.col("id").cast("bigint").alias("team_id"),
@@ -178,11 +178,11 @@ def silver_teams_cleaned():
 Silver Layer Configuration Instructions:
 
 1. Prerequisites:
-   - Bronze teams table must exist: {catalog}.bronze.teams_bronze
+   - Bronze teams table must exist: {catalog}.bronze_raw.teams
    - Set catalog parameter in DLT pipeline: {"catalog": "cfdb_dev"}
 
 2. Output table:
-   - {catalog}.silver.teams_cleaned
+   - {catalog}.silver_clean.teams
 
 3. Streaming Table Benefits:
    - Required for APPLY CHANGES INTO in gold layer
@@ -207,11 +207,11 @@ Silver Layer Configuration Instructions:
 
 6. Usage for CDC:
    APPLY CHANGES INTO gold.dim_teams
-   FROM silver.teams_cleaned  
+   FROM silver_clean.teams  
    KEYS (team_id)
    SEQUENCE BY data_year
    COLUMNS * EXCEPT (silver_processed_at)
    STORED AS SCD TYPE 2
 
-   Note: This silver table reads from bronze teams_bronze table
+   Note: This silver table reads from bronze_raw teams table
 """

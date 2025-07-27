@@ -33,9 +33,9 @@ def fact_game_predictions_gold():
     EPA ratings, recent form, and historical context for machine learning models.
     """
     
-    games = dlt.read(f"{catalog}.silver.fact_games_silver")
-    advanced_season_stats = dlt.read(f"{catalog}.silver.fact_advanced_season_stats_silver")
-    season_stats = dlt.read(f"{catalog}.silver.fact_season_stats_silver")
+    games = dlt.read(f"{catalog}.silver_clean.games")
+    advanced_season_stats = dlt.read(f"{catalog}.silver_clean.advanced_season_stats")
+    season_stats = dlt.read(f"{catalog}.silver_clean.season_stats")
     
     # Get home team advanced stats
     home_advanced = advanced_season_stats.alias("ha").select(

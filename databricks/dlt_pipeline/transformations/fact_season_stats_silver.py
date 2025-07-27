@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.silver.fact_season_stats_silver",
+    name=f"{catalog}.silver_clean.season_stats",
     comment="Silver layer - FBS team season statistics with calculated efficiency and performance metrics",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -27,15 +27,15 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 @dlt.expect_or_fail("fbs_teams_only", "team_id IS NOT NULL")  # Only teams that exist in FBS teams table
 @dlt.expect_or_fail("positive_games", "games > 0")
 @dlt.expect_or_fail("reasonable_totals", "total_yards >= 0 AND total_yards_allowed >= 0")
-def fact_season_stats_silver():
+def season_stats():
     """
     Season-aggregated statistics for FBS teams with efficiency metrics.
     
     Filters to FBS teams only and adds calculated performance indicators.
     """
     
-    season_stats = dlt.read(f"{catalog}.bronze.season_stats_bronze")
-    teams = dlt.read(f"{catalog}.bronze.teams_bronze")
+    season_stats = dlt.read(f"{catalog}.bronze_raw.season_stats")
+    teams = dlt.read(f"{catalog}.bronze_raw.teams")
     
     return (
         season_stats.alias("ss")

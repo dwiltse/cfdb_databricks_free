@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.bronze.plays_bronze",
+    name=f"{catalog}.bronze_raw.plays",
     comment="Bronze layer - Raw play-by-play data from Parquet files, partitioned by year, with audit fields",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -24,7 +24,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_game_id", "gameId IS NOT NULL")
 @dlt.expect_or_drop("valid_drive_id", "driveId IS NOT NULL")
-def plays_bronze():
+def plays():
     """
     Ingests raw play-by-play Parquet data from S3 with audit fields.
     Data is partitioned by year in nested folders.

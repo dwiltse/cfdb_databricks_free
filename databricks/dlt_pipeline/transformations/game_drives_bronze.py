@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.bronze.game_drives_bronze",
+    name=f"{catalog}.bronze_raw.drives",
     comment="Bronze layer - Raw game drives data from CSV files with audit fields",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -24,7 +24,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 )
 @dlt.expect_or_fail("valid_game_id", "gameId IS NOT NULL")
 @dlt.expect_or_drop("valid_drive_id", "id IS NOT NULL")
-def game_drives_bronze():
+def drives():
     """
     Ingests raw game drives CSV data from S3 with audit fields.
     

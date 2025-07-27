@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.bronze.conferences_bronze",
+    name=f"{catalog}.bronze_raw.conferences",
     comment="Bronze layer - Raw conferences data from CSV files with audit fields",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -23,7 +23,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
     }
 )
 @dlt.expect_or_drop("valid_conference_name", "name IS NOT NULL AND length(trim(name)) > 0")
-def conferences_bronze():
+def conferences():
     """
     Ingests raw conferences CSV data from S3 with audit fields.
     

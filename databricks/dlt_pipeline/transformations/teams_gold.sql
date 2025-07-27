@@ -26,7 +26,7 @@ AS (
         PARTITION BY team_id 
         ORDER BY data_year DESC, silver_processed_at DESC NULLS LAST
       ) as row_number
-    FROM cfdb_dev.silver.teams_cleaned
+    FROM cfdb_dev.silver_clean.teams
     WHERE team_id IS NOT NULL 
       AND school_name IS NOT NULL
       AND data_year >= YEAR(CURRENT_DATE()) - 5  -- Performance filter
@@ -87,7 +87,7 @@ TBLPROPERTIES (
 
 -- APPLY CHANGES INTO for Automatic SCD Type 2
 APPLY CHANGES INTO cfdb_dev.gold.dim_team_scd
-FROM STREAM(cfdb_dev.silver.teams_cleaned)
+FROM STREAM(cfdb_dev.silver_clean.teams)
 KEYS (team_id)
 SEQUENCE BY data_year
 COLUMNS * EXCEPT (silver_processed_at)

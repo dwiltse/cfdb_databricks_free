@@ -13,7 +13,7 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 # =============================================================================
 
 @dlt.table(
-    name=f"{catalog}.silver.fact_drives_silver",
+    name=f"{catalog}.silver_clean.drives",
     comment="Silver layer - Drive details for FBS games with calculated metrics",
     table_properties={
         "delta.autoOptimize.optimizeWrite": "true",
@@ -26,15 +26,15 @@ catalog = spark.conf.get("catalog", "cfdb_dev")  # Default to 'cfdb_dev' if not 
 @dlt.expect_or_fail("valid_drive_id", "drive_id IS NOT NULL")
 @dlt.expect_or_fail("valid_drive_number", "drive_number >= 1")
 @dlt.expect_or_fail("valid_teams", "offense IS NOT NULL AND defense IS NOT NULL")
-def fact_drives_silver():
+def drives():
     """
     Drive-level details linked to FBS games with performance metrics.
     
     Only includes drives from games involving FBS teams.
     """
     
-    drives = dlt.read(f"{catalog}.bronze.game_drives_bronze")
-    games = dlt.read(f"{catalog}.silver.fact_games_silver")
+    drives = dlt.read(f"{catalog}.bronze_raw.drives")
+    games = dlt.read(f"{catalog}.silver_clean.games")
     
     return (
         drives.alias("d")
