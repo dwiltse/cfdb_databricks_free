@@ -1,0 +1,467 @@
+{
+  "version": "1.0",
+  "displayName": "CFDB Offensive Rankings Dashboard",
+  "description": "College Football Offensive Statistics Rankings - NCAA.com style with Databricks AI/BI optimizations",
+  "datasets": [
+    {
+      "name": "offensive_rankings",
+      "displayName": "Offensive Team Rankings",
+      "query": "WITH offensive_rankings AS (\n  SELECT \n    s.season,\n    s.team_name,\n    COALESCE(t.primary_logo_url, 'https://via.placeholder.com/30x30.png?text=CFB') as team_logo,\n    s.conference_name,\n    CAST(s.games AS INTEGER) as G,\n    CAST((s.rushing_attempts + s.pass_attempts) AS INTEGER) as PLAYS,\n    CAST(s.total_yards AS INTEGER) as YDS,\n    ROUND(CAST(s.yards_per_play AS DOUBLE), 2) as YDS_PLAY,\n    CAST((s.passing_tds + s.rushing_tds) AS INTEGER) as OFF_TDS,\n    ROUND(CAST(s.yards_per_game AS DOUBLE), 1) as YPG,\n    -- Enhanced metrics for advanced analytics\n    ROUND(CAST(s.total_yards AS DOUBLE) / NULLIF(CAST(s.games AS DOUBLE), 0) / \n          NULLIF(CAST(s.rushing_attempts + s.pass_attempts AS DOUBLE), 0) * s.games, 2) as EFFICIENCY_RATING,\n    ROUND(ABS(s.rushing_yards - s.net_passing_yards) / NULLIF(CAST(s.total_yards AS DOUBLE), 0) * 100, 1) as BALANCE_SCORE\n  FROM cfdb_dev.silver_clean.season_stats s\n  JOIN cfdb_dev.silver_clean.teams t ON s.team_id = t.team_id\n  WHERE s.season = {{season}}\n    AND s.games > 0\n    AND s.total_yards > 0\n    AND (s.rushing_attempts + s.pass_attempts) > 0\n    AND ({{conference}} = 'All' OR t.conference_name = {{conference}})\n),\nranked_offense AS (\n  SELECT *,\n    ROW_NUMBER() OVER (ORDER BY YPG DESC) as RANK\n  FROM offensive_rankings\n)\nSELECT \n  RANK, \n  team_name as TEAM, \n  team_logo, \n  conference_name as CONFERENCE,\n  G, \n  PLAYS, \n  YDS, \n  YDS_PLAY, \n  OFF_TDS, \n  YPG,\n  EFFICIENCY_RATING,\n  BALANCE_SCORE\nFROM ranked_offense\nORDER BY RANK\nLIMIT {{top_teams}}"
+    },
+    {
+      "name": "conference_summary",
+      "displayName": "Conference Offensive Summary",
+      "query": "WITH conference_stats AS (\n  SELECT \n    t.conference_name,\n    COUNT(*) as team_count,\n    ROUND(AVG(CAST(s.yards_per_game AS DOUBLE)), 1) as avg_ypg,\n    ROUND(AVG(CAST(s.yards_per_play AS DOUBLE)), 2) as avg_ypp,\n    SUM(CAST(s.passing_tds + s.rushing_tds AS INTEGER)) as total_tds\n  FROM cfdb_dev.silver_clean.season_stats s\n  JOIN cfdb_dev.silver_clean.teams t ON s.team_id = t.team_id\n  WHERE s.season = {{season}}\n    AND s.games > 0\n  GROUP BY t.conference_name\n)\nSELECT *\nFROM conference_stats\nORDER BY avg_ypg DESC"
+    }
+  ],
+  "pages": [
+    {
+      "name": "main_page",
+      "displayName": "Total Offense Rankings",
+      "layout": [
+        {
+          "widget": {
+            "name": "title_widget",
+            "textbox": {
+              "text": "# 🏈 College Football - Total Offense Rankings\n\n**FBS Team Statistics | Season {{season}}**\n\n*Last updated: {{current_date}} | Data source: College Football Data API*"
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filters_widget",
+            "textbox": {
+              "text": "### 📊 Dashboard Filters\n- **Season**: {{season}}\n- **Conference**: {{conference}}\n- **Showing Top**: {{top_teams}} teams\n\n*Use the parameter controls above to customize your view*"
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 8,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "key_metrics",
+            "queries": [
+              {
+                "name": "top_team_stats",
+                "query": {
+                  "datasetName": "offensive_rankings",
+                  "fields": [
+                    {
+                      "name": "TEAM",
+                      "expression": "TEAM"
+                    },
+                    {
+                      "name": "YPG",
+                      "expression": "YPG"
+                    },
+                    {
+                      "name": "OFF_TDS",
+                      "expression": "OFF_TDS"
+                    }
+                  ],
+                  "disaggregated": true,
+                  "limit": 1
+                }
+              }
+            ],
+            "spec": {
+              "version": "3.0",
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "YPG",
+                  "displayName": "Top Team YPG"
+                },
+                "label": {
+                  "fieldName": "TEAM",
+                  "displayName": "Leading Team"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "offensive_rankings_table",
+            "queries": [
+              {
+                "name": "main_rankings",
+                "query": {
+                  "datasetName": "offensive_rankings"
+                }
+              }
+            ],
+            "spec": {
+              "version": "3.0",
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "RANK",
+                    "displayName": "RANK",
+                    "type": "integer",
+                    "format": {
+                      "type": "number",
+                      "precision": 0
+                    }
+                  },
+                  {
+                    "fieldName": "team_logo",
+                    "displayName": "LOGO",
+                    "type": "string",
+                    "format": {
+                      "type": "image",
+                      "imageWidth": 25,
+                      "imageHeight": 25
+                    }
+                  },
+                  {
+                    "fieldName": "TEAM",
+                    "displayName": "TEAM",
+                    "type": "string"
+                  },
+                  {
+                    "fieldName": "CONFERENCE",
+                    "displayName": "CONF",
+                    "type": "string"
+                  },
+                  {
+                    "fieldName": "G",
+                    "displayName": "G",
+                    "type": "integer",
+                    "format": {
+                      "type": "number",
+                      "precision": 0
+                    }
+                  },
+                  {
+                    "fieldName": "PLAYS",
+                    "displayName": "PLAYS",
+                    "type": "integer",
+                    "format": {
+                      "type": "number",
+                      "precision": 0
+                    }
+                  },
+                  {
+                    "fieldName": "YDS",
+                    "displayName": "YDS",
+                    "type": "integer",
+                    "format": {
+                      "type": "number",
+                      "precision": 0
+                    }
+                  },
+                  {
+                    "fieldName": "YDS_PLAY",
+                    "displayName": "YDS/PLAY",
+                    "type": "float",
+                    "format": {
+                      "type": "number",
+                      "precision": 2
+                    }
+                  },
+                  {
+                    "fieldName": "OFF_TDS",
+                    "displayName": "OFF TDS",
+                    "type": "integer",
+                    "format": {
+                      "type": "number",
+                      "precision": 0
+                    }
+                  },
+                  {
+                    "fieldName": "YPG",
+                    "displayName": "YPG",
+                    "type": "float",
+                    "format": {
+                      "type": "number",
+                      "precision": 1
+                    }
+                  },
+                  {
+                    "fieldName": "EFFICIENCY_RATING",
+                    "displayName": "EFF",
+                    "type": "float",
+                    "format": {
+                      "type": "number",
+                      "precision": 2
+                    }
+                  },
+                  {
+                    "fieldName": "BALANCE_SCORE",
+                    "displayName": "BAL%",
+                    "type": "float",
+                    "format": {
+                      "type": "number",
+                      "precision": 1
+                    }
+                  }
+                ]
+              },
+              "frame": {
+                "showHeader": true,
+                "showRowNumber": false,
+                "showColumnBorders": true,
+                "showRowBorders": true
+              },
+              "conditionalFormatting": [
+                {
+                  "condition": {
+                    "column": "YPG",
+                    "operator": ">=",
+                    "value": 500
+                  },
+                  "style": {
+                    "backgroundColor": "#d4edda",
+                    "textColor": "#155724",
+                    "fontWeight": "bold"
+                  }
+                },
+                {
+                  "condition": {
+                    "column": "YPG",
+                    "operator": ">=",
+                    "value": 450
+                  },
+                  "style": {
+                    "backgroundColor": "#fff3cd",
+                    "textColor": "#856404"
+                  }
+                },
+                {
+                  "condition": {
+                    "column": "YPG",
+                    "operator": "<",
+                    "value": 350
+                  },
+                  "style": {
+                    "backgroundColor": "#f8d7da",
+                    "textColor": "#721c24"
+                  }
+                },
+                {
+                  "condition": {
+                    "column": "RANK",
+                    "operator": "<=",
+                    "value": 5
+                  },
+                  "style": {
+                    "fontWeight": "bold",
+                    "textColor": "#0066cc"
+                  }
+                },
+                {
+                  "condition": {
+                    "column": "EFFICIENCY_RATING",
+                    "operator": ">=",
+                    "value": 7.0
+                  },
+                  "style": {
+                    "backgroundColor": "#e7f3ff",
+                    "textColor": "#0066cc"
+                  }
+                }
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 12,
+            "height": 10
+          }
+        },
+        {
+          "widget": {
+            "name": "conference_comparison",
+            "queries": [
+              {
+                "name": "conf_stats",
+                "query": {
+                  "datasetName": "conference_summary"
+                }
+              }
+            ],
+            "spec": {
+              "version": "3.0",
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "conference_name",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Conference"
+                },
+                "y": {
+                  "fieldName": "avg_ypg",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Average YPG"
+                },
+                "color": {
+                  "fieldName": "total_tds",
+                  "scale": {
+                    "type": "quantitative",
+                    "range": ["#ff7f0e", "#2ca02c"]
+                  },
+                  "displayName": "Total TDs"
+                }
+              },
+              "frame": {
+                "showLegend": true,
+                "xAxis": {
+                  "rotate": 45
+                },
+                "title": "Conference Offensive Performance Comparison"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "top_performers_chart",
+            "queries": [
+              {
+                "name": "top_10_offense",
+                "query": {
+                  "datasetName": "offensive_rankings",
+                  "fields": [
+                    {
+                      "name": "TEAM",
+                      "expression": "TEAM"
+                    },
+                    {
+                      "name": "YPG",
+                      "expression": "YPG"
+                    },
+                    {
+                      "name": "OFF_TDS",
+                      "expression": "OFF_TDS"
+                    },
+                    {
+                      "name": "EFFICIENCY_RATING",
+                      "expression": "EFFICIENCY_RATING"
+                    }
+                  ],
+                  "disaggregated": true,
+                  "limit": 10
+                }
+              }
+            ],
+            "spec": {
+              "version": "3.0",
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "YPG",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Yards Per Game"
+                },
+                "y": {
+                  "fieldName": "OFF_TDS",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Offensive TDs"
+                },
+                "size": {
+                  "fieldName": "EFFICIENCY_RATING",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Efficiency Rating"
+                },
+                "color": {
+                  "fieldName": "TEAM",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Team"
+                }
+              },
+              "frame": {
+                "showLegend": false,
+                "title": "Top 10 Teams: YPG vs Touchdowns (Size = Efficiency)"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ]
+    }
+  ],
+  "parameters": [
+    {
+      "name": "season",
+      "displayName": "Season",
+      "type": "integer",
+      "defaultValue": 2024,
+      "allowedValues": [2020, 2021, 2022, 2023, 2024, 2025]
+    },
+    {
+      "name": "conference",
+      "displayName": "Conference Filter",
+      "type": "string",
+      "defaultValue": "All",
+      "allowedValues": [
+        "All", 
+        "SEC", 
+        "Big Ten", 
+        "ACC", 
+        "Big 12", 
+        "Pac-12", 
+        "AAC", 
+        "Mountain West", 
+        "Conference USA", 
+        "MAC", 
+        "Sun Belt",
+        "FBS Independents"
+      ]
+    },
+    {
+      "name": "top_teams",
+      "displayName": "Number of Teams to Show",
+      "type": "integer", 
+      "defaultValue": 25,
+      "allowedValues": [10, 15, 25, 50, 100, 134]
+    },
+    {
+      "name": "current_date",
+      "displayName": "Current Date",
+      "type": "string",
+      "defaultValue": "February 11, 2025"
+    }
+  ]
+}
